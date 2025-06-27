@@ -259,8 +259,8 @@
                 const alpha = map(this.age, 0, this.lifetime, 255, 0);
                 fill(red(this.colour), green(this.colour), blue(this.colour), alpha);
                 
-                // Draw hexagon effect
-                this.drawHexEffect(0, 0, this.radius);
+                 // Draw spiral effect instead of hex effect
+                this.drawSpiralEffect(0, 0, this.radius);
                 
                 pop();
                 
@@ -285,35 +285,56 @@
                 this.age++;
             }
             
-            // Modified method to draw hexagon effects
-            drawHexEffect(x, y, radius) {
+            // New method to draw spiral effects
+            drawSpiralEffect(x, y, radius) {
                 if (this.effectType === 0) {
-                    // Single hexagon
+                    // Single hexagon (unchanged for this type)
                     this.drawHexagon(x, y, radius);
                 } else if (this.effectType === 1) {
-                    // Hexagonal grid pattern
-                    const gridSize = 3;
-                    // In a hex grid, rows are offset
-                    const hexWidth = radius;
-                    const hexHeight = radius * 0.866; // sqrt(3)/2 * radius
+                     // Spiral pattern
+                    const turns = 3; // Number of spiral turns
+                    const pointsPerTurn = 8; // Density of the spiral
+                    const totalPoints = turns * pointsPerTurn;
       
-                    for (let i = -gridSize; i <= gridSize; i++) {
-                        const rowOffset = (i % 2) * 0.5; // Offset every other row
-                        for (let j = -gridSize; j <= gridSize; j++) {
-                            if (random() > 0.3) { // Random gaps
-                                    const hexX = x + (j + rowOffset) * hexWidth * 1.5;
-                                    const hexY = y + i * hexHeight * 1.7;
+                    for (let i = 0; i < totalPoints; i++) {
+                        // Calculate spiral coordinates
+                        const angle = 0.5 * i; // Controls how tight the spiral is
+                        const distance = (i / totalPoints) * radius;
+                        const spiralX = x + cos(angle) * distance;
+                        const spiralY = y + sin(angle) * distance;
+
+                         // Draw hexagons along the spiral
+                            if (random() > 0.2) { // Random gaps
+                                    const scaleFactor = map(i, 0, totalPoints, 0.8, 0.2);
+                                     // Smaller hexagons toward outside
                                     this.drawHexagon(hexX, hexY, radius * 0.4);
-                            }
-                        }
+                         }
                     }
                 } else {
-                    // Layered hexagons
-                    for (let i = 0; i < 3; i++) {
-                        const currentAlpha = map(this.age, 0, this.lifetime, 255, 0) / (i + 1);
-                        fill(red(this.colour), green(this.colour), blue(this.colour), currentAlpha);
-                        this.drawHexagon(x, y, radius * (1 - i * 0.2));
-                    }
+                    // Exaggerated spiral pattern
+                    const spiralArms = 3; // Number of spiral arms
+                    const pointsPerArm = 12; // Points per arm
+                    
+                    for (let arm = 0; arm < spiralArms; arm++) {
+                        const armOffset = TWO_PI / spiralArms * arm;
+
+                        for (let i = 0; i < pointsPerArm; i++) {
+                            // Calculate exaggerated spiral coordinates
+                            const angle = armOffset + i * 0.5; // Controls spiral tightness
+                            const distance = (i / pointsPerArm) * radius * 1.2; // Slightly larger radius
+                            const distortion = sin(i * 0.8) * 10; // Add waviness to the spiral
+
+                            const spiralX = x + cos(angle) * (distance + distortion);
+                            const spiralY = y + sin(angle) * (distance + distortion);
+
+                            // Draw hexagons along the spiral
+                            const hexSize = radius * map(i, 0, pointsPerArm, 0.6, 0.1);
+                            const currentAlpha = map(this.age, 0, this.lifetime, 255, 0) * map(i, 0, pointsPerArm, 1, 0.3);
+                            fill(red(this.colour), green(this.colour), blue(this.colour), currentAlpha);
+
+                            this.drawHexagon(spiralX, spiralY, hexSize);
+                        }
+                     }
                 }
             }
             
@@ -489,17 +510,17 @@
                  // Randomly choose between red and green colors
                  let circleColor;
 
-                if (random() < 0.5) { // 50% chance of red
-                    // Red colors (low blue, low green, high red)
+                if (random() < 0.5) { // 50% chance of purple
+                    // purple colors (high blue, low green, high red)
                     circleColor = color(
                         random(200, 255),  // high red
                         random(0, 100), // low green
-                        random(0, 50)  // low blue
+                        random(200, 255)  // high blue
                     );
-                } else { // 50% chance of green
-                    // Green colors (low red, high green, low blue)
+                } else { // 50% chance of yellow
+                    // yellow colors (high red, high green, low blue)
                     circleColor = color(
-                        random(0, 100), // low red
+                        random(200, 255), // high red
                         random(200, 255), // high green
                         random(0, 50)     // low blue
                     );
