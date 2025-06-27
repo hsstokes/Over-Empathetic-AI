@@ -307,7 +307,8 @@
                             if (random() > 0.2) { // Random gaps
                                     const scaleFactor = map(i, 0, totalPoints, 0.8, 0.2);
                                      // Smaller hexagons toward outside
-                                    this.drawHexagon(hexX, hexY, radius * 0.4);
+                                    this.drawHexagon(spiralX, spiralY, radius * scaleFactor);
+                                // ^ This was the error - using hexX, hexY instead of spiralX, spiralY
                          }
                     }
                 } else {
